@@ -1,0 +1,30 @@
+name: Scheduled Automation
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository files
+        uses: actions/checkout@v4
+
+      - name: Run scheduled task
+        run: |
+          echo "Automation ran at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> logs/automation-log.txt
+          echo "Task completed successfully."
+
+      - name: Save updated log file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add logs/automation-log.txt
+          git commit -m "Update automation log" || echo "No changes to commit"
+          git push
